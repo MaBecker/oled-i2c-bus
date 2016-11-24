@@ -1,5 +1,6 @@
 var Oled = function(i2c, opts) {
 
+  this.OLED_CHUNK = 128;
   this.HEIGHT = opts.height || 32;
   this.WIDTH = opts.width || 128;
   this.ADDRESS = opts.address || 0x3C;
@@ -105,17 +106,31 @@ Oled.prototype._initialise = function() {
 // writes both commands and data buffers to this device
 Oled.prototype._transfer = function(type, val, fn) {
   var control;
+  var vLen;
+  var buf;
+  
   if (type === 'data') {
     control = 0x40;
+    if ( typeof val === 'number') {
+      vLen = 2;
+      buf = new Buffer([control, val]);
+    }
+    else {
+      vLen = val.length;
+      val[0] = control;
+      buf = new Buffer(val);
+    }
   } else if (type === 'cmd') {
     control = 0x00;
+    vLen = 2;
+    buf = new Buffer([control, val]);
   } else {
     return;
   }
 
   // send control and actual val
   // this.board.io.i2cWrite(this.ADDRESS, [control, val]);
-  this.wire.i2cWrite(this.ADDRESS, 2, new Buffer([control, val]), function(err) {
+  this.wire.i2cWrite(this.ADDRESS, vLen, buf, function(err) {
     //TODO: why fn is undefined?
     if(fn) {
       fn();
@@ -291,8 +306,10 @@ Oled.prototype.update = function() {
     }
 
     // write buffer data
-    for (v = 0; v < bufferLen; v += 1) {
-      this._transfer('data', this.buffer[v]);
+    var chunk = new Uint8Array(this.OLED_CHUNK+1);
+    for (var p=0; p<bufferLen; p+=this.OLED_CHUNK) {
+       chunk.set(new Uint8Array((new Uint8Array(this.buffer)).buffer,p,this.OLED_CHUNK),1);
+       this._transfer('data', chunk);
     }
 
   }.bind(this));
