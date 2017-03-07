@@ -176,13 +176,14 @@ Oled.prototype.setCursor = function(x, y) {
 }
 
 // write text to the oled
-Oled.prototype.writeString = function(font, size, string, color, wrap, sync) {
+Oled.prototype.writeString = function(font, size, string, color, wrap, linespacing, sync) {
   var immed = (typeof sync === 'undefined') ? true : sync;
   var wordArr = string.split(' '),
       len = wordArr.length,
       // start x offset at cursor pos
       offset = this.cursor_x,
-      padding = 0, letspace = 1, leading = 2;
+      padding = 0, letspace = 1;
+  var leading = linespacing || 2;
 
   // loop through words
   for (var w = 0; w < len; w += 1) {
@@ -206,7 +207,7 @@ Oled.prototype.writeString = function(font, size, string, color, wrap, sync) {
       // read the bits in the bytes that make up the char
       var charBytes = this._readCharBytes(charBuf);
       // draw the entire character
-      this._drawChar(charBytes, size, false);
+      this._drawChar(font, charBytes, size, false);
 
       // calc new x position for the next char, add a touch of padding too if it's a non space char
       padding = (stringArr[i] === ' ') ? 0 : size + letspace;
