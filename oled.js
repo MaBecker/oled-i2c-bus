@@ -282,10 +282,11 @@ Oled.prototype._readCharBytes = function(byteArray) {
 
 // find where the character exists within the font object
 Oled.prototype._findCharBuf = function(font, c) {
+  var charLength = Math.ceil((font.width * font.height) / 8);
   // use the lookup array as a ref to find where the current char bytes start
-  var cBufPos = font.lookup.indexOf(c) * font.width;
+  var cBufPos = font.lookup.indexOf(c) * charLength;
   // slice just the current char's bytes out of the fontData array and return
-  var cBuf = font.fontData.slice(cBufPos, cBufPos + font.width);
+  var cBuf = font.fontData.slice(cBufPos, cBufPos + charLength);
   return cBuf;
 }
 
