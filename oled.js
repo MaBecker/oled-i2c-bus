@@ -227,21 +227,24 @@ Oled.prototype.writeString = function(font, size, string, color, wrap, sync) {
 }
 
 // draw an individual character to the screen
-Oled.prototype._drawChar = function(byteArray, size, sync) {
+Oled.prototype._drawChar = function(font, byteArray, size, sync) {
   // take your positions...
   var x = this.cursor_x,
       y = this.cursor_y;
 
+  var pagePos = 0;
+  var c = 0;
   // loop through the byte array containing the hexes for the char
   for (var i = 0; i < byteArray.length; i += 1) {
+    pagePos = Math.floor(i / font.width) * 8;
     for (var j = 0; j < 8; j += 1) {
       // pull color out
       var color = byteArray[i][j],
           xpos, ypos;
       // standard font size
       if (size === 1) {
-        xpos = x + i;
-        ypos = y + j;
+        xpos = x + c;
+        ypos = y + j + pagePos;
         this.drawPixel([xpos, ypos, color], false);
       } else {
         // MATH! Calculating pixel size multiplier to primitively scale the font
@@ -250,6 +253,7 @@ Oled.prototype._drawChar = function(byteArray, size, sync) {
         this.fillRect(xpos, ypos, size, size, color, false);
       }
     }
+    c = (c < font.width -1) ? c += 1 : 0;
   }
 }
 
