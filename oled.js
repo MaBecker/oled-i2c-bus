@@ -64,7 +64,7 @@ var Oled = function(i2c, opts) {
   };
 
   // Setup i2c
-  console.log('this.ADDRESS: ' + this.ADDRESS);
+  // console.log('this.ADDRESS: ' + this.ADDRESS);
   this.wire = i2c;
 
   var screenSize = this.WIDTH + 'x' + this.HEIGHT;
@@ -98,9 +98,11 @@ Oled.prototype._initialise = function() {
   var i, initSeqLen = initSeq.length;
 
   // write init seq commands
+  /*
   for (i = 0; i < initSeqLen; i ++) {
     this._transfer('cmd', initSeq[i]);
   }
+  */
 }
 
 // writes both commands and data buffers to this device
